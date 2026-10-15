@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in · Barangay San Isidro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css"></head><body>
+<div class="login">
+ <section class="hero"><div class="brand"><div class="logo">🏛</div><div>Barangay San Isidro<small>QUEZON CITY</small></div></div>
+  <h1>Faster records. Better service for every resident.</h1>
+  <p>Secure resident records, requests, certificates, incidents, assistance, and QR-assisted transactions.</p></section>
+ <section class="login-box"><form class="card" id="f">
+  <a>Staff portal</a><h2>Welcome back</h2><p class="sub">Sign in to manage today's barangay services.</p>
+  <label for="e">Email address</label><input id="e" type="email" value="ana.mendoza@sanisidro.gov.ph" required>
+  <label for="p">Password</label><input id="p" type="password" value="password123" required>
+  <p id="err" class="hide" style="color:#c0392b;margin-top:10px">Enter your email and password to continue.</p>
+  <button class="btn" style="width:100%;margin-top:20px">Sign in to dashboard</button>
+ </form></section></div>
+<script>document.getElementById('f').onsubmit=e=>{e.preventDefault();sessionStorage.setItem('staff','Ana Mendoza');location.href='dashboard.html'}</script>
+</body></html>
