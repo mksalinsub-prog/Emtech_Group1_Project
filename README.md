@@ -14,35 +14,35 @@ Barangay offices still rely on paper forms, separate logbooks, and manual search
 
 ## Features
 
-| Module | What it does |
-|---|---|
-| Login | Staff sign-in screen for the portal |
-| Dashboard | Pending requests, alerts, daily counts, and quick actions |
-| Residents | Search by name, ID, address, or household; filter by purok |
-| Certificates | Choose a resident and certificate type, preview, then issue |
-| QR Scanner | Simulated scan that loads the matching resident record |
-| Incidents | Log a new incident and review the history |
-| Complaints | Submit and track complaints |
-| Inquiries / Allowances | Assistance requests and allowance categories |
+| Module                 | What it does                                                |
+| ---------------------- | ----------------------------------------------------------- |
+| Login                  | Staff sign-in screen for the portal                         |
+| Dashboard              | Pending requests, alerts, daily counts, and quick actions   |
+| Residents              | Search by name, ID, address, or household; filter by purok  |
+| Certificates           | Choose a resident and certificate type, preview, then issue |
+| QR Scanner             | Simulated scan that loads the matching resident record      |
+| Incidents              | Log a new incident and review the history                   |
+| Complaints             | Submit and track complaints                                 |
+| Inquiries / Allowances | Assistance requests and allowance categories                |
 
 Incidents and complaints you add are saved in the browser (`localStorage`).
 
 ## Screenshots
 
-| Login | Staff dashboard |
-|---|---|
+| Login                                  | Staff dashboard                                            |
+| -------------------------------------- | ---------------------------------------------------------- |
 | ![Login](assets/screenshots/login.png) | ![Staff dashboard](assets/screenshots/staff-dashboard.png) |
 
-| Resident database | Certificate issuance |
-|---|---|
+| Resident database                                              | Certificate issuance                                                            |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | ![Resident database](assets/screenshots/resident-database.png) | ![Certificate dashboard](assets/screenshots/certificate-issuance-dashboard.png) |
 
-| QR resident match | Complaints overview |
-|---|---|
+| QR resident match                                     | Complaints overview                                       |
+| ----------------------------------------------------- | --------------------------------------------------------- |
 | ![QR match](assets/screenshots/qr-resident-match.png) | ![Complaints](assets/screenshots/complaints-overview.png) |
 
-| Log new incident | Allowance management |
-|---|---|
+| Log new incident                                         | Allowance management                                               |
+| -------------------------------------------------------- | ------------------------------------------------------------------ |
 | ![Log incident](assets/screenshots/log-new-incident.png) | ![Allowances](assets/screenshots/allowance-management-records.png) |
 
 The full set of 25 UI/UX design screens is in [`assets/screenshots/`](assets/screenshots/).
@@ -71,4 +71,8 @@ HTML, CSS, and vanilla JavaScript. The sample data is fictional.
 
 ## Author
 
-Dwyane Jorge R. Ganados · CPE308, section CPE31S1
+Karl Siegfreid Alinsub · CPE308, section CPE31S1
+Dwyane Jorge Ganados · CPE308, section CPE31S1
+Jei Ervin Icalabis · CPE308, section CPE31S1
+Venn Laurence Ruga · CPE308, section CPE31S1
+Michael Benedict Toledo · CPE308, section CPE31S1
