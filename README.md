@@ -71,8 +71,8 @@ HTML, CSS, and vanilla JavaScript. The sample data is fictional.
 
 ## Author
 
-Karl Siegfreid Alinsub · CPE308, section CPE31S1
-Dwyane Jorge Ganados · CPE308, section CPE31S1
-Jei Ervin Icalabis · CPE308, section CPE31S1
-Venn Laurence Ruga · CPE308, section CPE31S1
+Karl Siegfreid Alinsub · CPE308, section CPE31S1  
+Dwyane Jorge Ganados · CPE308, section CPE31S1  
+Jei Ervin Icalabis · CPE308, section CPE31S1  
+Venn Laurence Ruga · CPE308, section CPE31S1  
 Michael Benedict Toledo · CPE308, section CPE31S1
