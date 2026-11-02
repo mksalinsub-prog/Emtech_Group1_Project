@@ -12,6 +12,7 @@ import Complaints from './pages/Complaints'
 import Inquiries from './pages/Inquiries'
 import Allowances from './pages/Allowances'
 import Portal from './pages/Portal'
+import ResidentForm from './pages/ResidentForm'
 
 export default function App() {
   return (
