@@ -108,3 +108,9 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #f1f4f9; color
 .add-update input { flex: 1; padding: 10px 12px; border: 1px solid #d5d9e8; border-radius: 8px; font: inherit; }
 .badge.under-review { background: #fdf0d5; color: #9a5b00; }
 .badge.referred, .badge.in-progress { background: #dfe9ff; color: #1f4fb0; }
+.doc-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f1f4f9; border-radius: 8px; margin-bottom: 8px; }
+.badge.documents-needed, .badge.for-verification { background: #fdf0d5; color: #9a5b00; }
+.badge.for-assessment { background: #dfe9ff; color: #1f4fb0; }
+.badge.eligible, .badge.paid, .badge.received { background: #dff5ea; color: #11704a; }
+.badge.on-hold, .badge.missing { background: #fde2e2; color: #a12626; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
