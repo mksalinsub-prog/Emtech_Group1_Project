@@ -1,4 +1,4 @@
-# Barangay San Isidro Management System
+﻿# Barangay San Isidro Management System
 
 A front-end web application for barangay staff to manage resident records, certificate requests, QR-assisted transactions, incidents, complaints, assistance inquiries, and allowances in one place.
 
@@ -71,8 +71,8 @@ HTML, CSS, and vanilla JavaScript. The sample data is fictional.
 
 ## Author
 
-Karl Siegfreid Alinsub · CPE308, section CPE31S1  
-Dwyane Jorge Ganados · CPE308, section CPE31S1  
-Jei Ervin Icalabis · CPE308, section CPE31S1  
-Venn Laurence Ruga · CPE308, section CPE31S1  
-Michael Benedict Toledo · CPE308, section CPE31S1
+Karl Siegfreid Alinsub Â· CPE308, section CPE31S1  
+Dwyane Jorge Ganados Â· CPE308, section CPE31S1  
+Jei Ervin Icalabis Â· CPE308, section CPE31S1  
+Venn Laurence Ruga Â· CPE308, section CPE31S1  
+Michael Benedict Toledo Â· CPE308, section CPE31S1
