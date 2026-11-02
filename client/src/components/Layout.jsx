@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+﻿import { NavLink, Outlet, Link } from 'react-router-dom'
 
 const links = [
   ['/', 'Dashboard'],
@@ -26,6 +26,13 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+        <div className="sidebar-user">
+          <div>
+            <strong>Ana Mendoza</strong>
+            <small>Barangay Administrator</small>
+          </div>
+          <Link to="/login" className="logout">Log out</Link>
+        </div>
       </aside>
       <main className="content">
         <Outlet />
