@@ -40,6 +40,7 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #f1f4f9; color
 .role-tabs button { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #d5d9e8; background: #fff; cursor: pointer; font: inherit; }
 .role-tabs button.on { background: #111a45; color: #fff; border-color: #111a45; }
 .login-meta { display: flex; justify-content: space-between; font-size: 13px; margin-top: 12px; }
+<<<<<<< HEAD
 .portal-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #fff; padding: 14px 28px; box-shadow: 0 1px 3px rgba(20, 30, 70, 0.08); }
 .portal-nav { display: flex; gap: 6px; }
 .portal-nav button { border: 0; background: none; padding: 8px 14px; border-radius: 8px; font: inherit; cursor: pointer; color: #6b7390; }
@@ -60,3 +61,23 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #f1f4f9; color
 .sidebar-user { border-top: 1px solid #2a2f6b; padding-top: 14px; margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .sidebar-user small { display: block; opacity: 0.6; }
 .sidebar a.logout { background: #2a2f6b; text-align: center; color: #fff; }
+=======
+.steps { display: flex; gap: 8px; margin: 16px 0 20px; flex-wrap: wrap; }
+.step-pill { padding: 6px 14px; border-radius: 99px; font-size: 13px; background: #e5e7f5; color: #6b7390; }
+.step-pill.now { background: #111a45; color: #fff; }
+.step-pill.past { background: #dff5ea; color: #11704a; }
+.scan-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: start; }
+.scan-frame { background: #111a45; border-radius: 12px; height: 260px; display: flex; align-items: center; justify-content: center; color: #cfd5ee; margin-bottom: 14px; }
+.scan-frame div { border: 3px solid #cfd5ee; border-radius: 16px; padding: 70px 50px; }
+.scan-frame.busy div { border-color: #12a58f; color: #12a58f; }
+.scan-form { display: flex; gap: 8px; }
+.scan-form input { flex: 1; padding: 10px 12px; border: 1px solid #d5d9e8; border-radius: 8px; font: inherit; }
+.chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.chip { border: 1px solid #d5d9e8; background: #fff; border-radius: 99px; padding: 4px 12px; font: inherit; font-size: 12px; cursor: pointer; }
+.error { background: #fde2e2; color: #a12626; padding: 10px 12px; border-radius: 8px; margin-top: 10px; font-size: 14px; }
+.match-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+.btn-row { display: flex; gap: 10px; margin-top: 16px; }
+.btn.ghost { background: #fff; color: #111a45; border: 1px solid #d5d9e8; }
+.service-list { display: flex; flex-direction: column; gap: 8px; }
+.service-list a { text-decoration: none; color: inherit; background: #f1f4f9; padding: 10px 12px; border-radius: 8px; }
+>>>>>>> main
