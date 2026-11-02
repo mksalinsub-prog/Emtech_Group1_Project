@@ -87,3 +87,16 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #f1f4f9; color
 .form-grid label { font-size: 13px; font-weight: 600; display: flex; flex-direction: column; gap: 6px; }
 .form-grid input, .form-grid select { padding: 10px 12px; border: 1px solid #d5d9e8; border-radius: 8px; font: inherit; font-weight: 400; background: #fff; }
 .success { background: #dff5ea; color: #11704a; padding: 10px 12px; border-radius: 8px; margin: 12px 0; font-size: 14px; }
+.type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.type-card { text-decoration: none; color: inherit; background: #f1f4f9; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+.type-card:hover { background: #e6f6f3; }
+.type-card .fee { align-self: flex-end; font-size: 12px; font-weight: 700; color: #0c7a6a; }
+.paper { background: #fff; border-radius: 8px; padding: 36px 40px; box-shadow: 0 1px 3px rgba(20, 30, 70, 0.12); line-height: 1.6; }
+.paper-head { text-align: center; margin-bottom: 18px; border-bottom: 2px solid #111a45; padding-bottom: 12px; }
+.paper h2 { text-align: center; color: #111a45; }
+.paper-foot { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 28px; }
+.checks div { padding: 4px 0; color: #11704a; font-size: 14px; }
+.form-grid textarea { padding: 10px 12px; border: 1px solid #d5d9e8; border-radius: 8px; font: inherit; font-weight: 400; min-height: 70px; }
+.form-grid input:disabled { background: #e6f6f3; color: #1a2238; }
+.badge.ready-to-release { background: #dff5ea; color: #11704a; }
+@media print { .sidebar, .no-print { display: none !important; } .content { padding: 0; } body { background: #fff; } .paper { box-shadow: none; } }
