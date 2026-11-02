@@ -100,3 +100,11 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #f1f4f9; color
 .form-grid input:disabled { background: #e6f6f3; color: #1a2238; }
 .badge.ready-to-release { background: #dff5ea; color: #11704a; }
 @media print { .sidebar, .no-print { display: none !important; } .content { padding: 0; } body { background: #fff; } .paper { box-shadow: none; } }
+.board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; }
+.case-card { display: block; width: 100%; text-align: left; background: #f1f4f9; border: 0; border-radius: 10px; padding: 12px; margin-bottom: 10px; font: inherit; cursor: pointer; }
+.case-card:hover { background: #e6f6f3; }
+.timeline-item { padding: 8px 0 8px 14px; border-left: 3px solid #12a58f; margin-left: 6px; }
+.add-update { display: flex; gap: 8px; margin-top: 14px; }
+.add-update input { flex: 1; padding: 10px 12px; border: 1px solid #d5d9e8; border-radius: 8px; font: inherit; }
+.badge.under-review { background: #fdf0d5; color: #9a5b00; }
+.badge.referred, .badge.in-progress { background: #dfe9ff; color: #1f4fb0; }
