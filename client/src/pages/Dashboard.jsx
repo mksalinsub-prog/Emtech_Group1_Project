@@ -29,8 +29,8 @@ export default function Dashboard() {
           {pendingRequests.map((r) => (
             <div className="row" key={r.id}>
               <div>
-                <strong>{r.title} · {r.who}</strong>
-                <div className="muted">{r.id} · {r.purpose}</div>
+                <strong>{r.title} Â· {r.who}</strong>
+                <div className="muted">{r.id} Â· {r.purpose}</div>
               </div>
               <StatusBadge status={r.status} />
             </div>
