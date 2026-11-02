@@ -55,6 +55,8 @@ export const myRequests = [
     copies: '-', release: 'Barangay office', status: 'Resolved', payment: null,
     steps: [['Inquiry submitted', true], ['Documents checked', true], ['Referred and resolved', true]],
   },
+]
+
 export const residents = [
   { id: 'B607-2026-01482', name: 'Maria Lourdes Reyes', address: '42 Sampaguita St., Purok 3', purok: 3, household: 'HH-0391', birthDate: 'April 12, 1992', sex: 'Female', civilStatus: 'Married', citizenship: 'Filipino', status: 'Active' },
   { id: 'B607-2025-01104', name: 'Joel P. Santos', address: '18 Mabini Ave., Purok 2', purok: 2, household: 'HH-1104', birthDate: 'August 3, 1985', sex: 'Male', civilStatus: 'Married', citizenship: 'Filipino', status: 'Active' },
