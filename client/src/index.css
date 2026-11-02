@@ -55,3 +55,8 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #f1f4f9; color
 .step.done { color: #11704a; }
 .notice { background: #e6f6f3; padding: 10px 12px; border-radius: 8px; font-size: 14px; }
 .badge.ready-to-claim, .badge.verified { background: #dff5ea; color: #11704a; }
+.sidebar { display: flex; flex-direction: column; }
+.sidebar nav { flex: 1; }
+.sidebar-user { border-top: 1px solid #2a2f6b; padding-top: 14px; margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.sidebar-user small { display: block; opacity: 0.6; }
+.sidebar a.logout { background: #2a2f6b; text-align: center; color: #fff; }
