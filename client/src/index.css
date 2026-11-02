@@ -7,4 +7,36 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #f1f4f9; color
 .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
 .sidebar a { color: #cfd5ee; text-decoration: none; padding: 10px 12px; border-radius: 8px; }
 .sidebar a.active { background: #2a2f6b; color: #fff; }
-.content { flex: 1; padding: 28px; }
+.content { flex: 1; padding: 28px; }h1 { margin: 0 0 4px; }
+.muted { color: #6b7390; font-size: 14px; margin: 0; }
+.card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(20, 30, 70, 0.08); }
+.card h3 { margin-top: 0; }
+.btn { background: #12a58f; color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 8px; border: 0; font: inherit; cursor: pointer; display: inline-block; }
+.page-head { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 20px; }
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.stat .tag { float: right; font-size: 12px; background: #e6f6f3; color: #0c7a6a; padding: 2px 8px; border-radius: 99px; }
+.stat-value { font-size: 32px; font-weight: 700; margin-top: 8px; }
+.two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #eef0f6; }
+.alert { background: #fff3dc; padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
+.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.quick-item { text-decoration: none; color: inherit; text-align: center; font-weight: 600; }
+.badge { padding: 3px 10px; border-radius: 99px; font-size: 12px; white-space: nowrap; background: #e5e7f5; color: #2a2f6b; }
+.badge.for-review { background: #fdf0d5; color: #9a5b00; }
+.badge.for-payment { background: #dfe9ff; color: #1f4fb0; }
+.badge.released, .badge.resolved, .badge.active { background: #dff5ea; color: #11704a; }
+.badge.open { background: #fde2e2; color: #a12626; }
+.login { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+.login-hero { background: #111a45; color: #fff; padding: 48px; display: flex; flex-direction: column; justify-content: flex-end; }
+.login-hero h2 { font-size: 36px; margin: 12px 0; }
+.login-hero p { opacity: 0.75; }
+.login-panel { display: flex; align-items: center; justify-content: center; padding: 24px; }
+.login-card { width: 100%; max-width: 380px; }
+.login-card label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+.login-card input[type='email'], .login-card input[type='password'] { width: 100%; padding: 10px 12px; border: 1px solid #d5d9e8; border-radius: 8px; font: inherit; }
+.login-card .btn { width: 100%; margin-top: 18px; }
+.role-tabs { display: flex; gap: 8px; margin: 14px 0; }
+.role-tabs button { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #d5d9e8; background: #fff; cursor: pointer; font: inherit; }
+.role-tabs button.on { background: #111a45; color: #fff; border-color: #111a45; }
+.login-meta { display: flex; justify-content: space-between; font-size: 13px; margin-top: 12px; }
