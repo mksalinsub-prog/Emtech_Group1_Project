@@ -40,3 +40,18 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #f1f4f9; color
 .role-tabs button { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #d5d9e8; background: #fff; cursor: pointer; font: inherit; }
 .role-tabs button.on { background: #111a45; color: #fff; border-color: #111a45; }
 .login-meta { display: flex; justify-content: space-between; font-size: 13px; margin-top: 12px; }
+.portal-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #fff; padding: 14px 28px; box-shadow: 0 1px 3px rgba(20, 30, 70, 0.08); }
+.portal-nav { display: flex; gap: 6px; }
+.portal-nav button { border: 0; background: none; padding: 8px 14px; border-radius: 8px; font: inherit; cursor: pointer; color: #6b7390; }
+.portal-nav button.on { background: #e6f6f3; color: #0c7a6a; font-weight: 600; }
+.portal-body { max-width: 1000px; margin: 0 auto; padding: 28px; }
+.portal-grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; margin-top: 16px; align-items: start; }
+.portal-grid > div { display: flex; flex-direction: column; gap: 16px; }
+.stat-grid.three { grid-template-columns: repeat(3, 1fr); }
+.qr-box { text-align: center; }
+.link-btn { border: 0; background: none; color: #0c7a6a; cursor: pointer; font: inherit; padding: 0; }
+.req-btn { display: flex; justify-content: space-between; align-items: center; width: 100%; background: none; border: 0; border-top: 1px solid #eef0f6; padding: 12px 0; font: inherit; text-align: left; cursor: pointer; }
+.step { padding: 6px 0; color: #6b7390; }
+.step.done { color: #11704a; }
+.notice { background: #e6f6f3; padding: 10px 12px; border-radius: 8px; font-size: 14px; }
+.badge.ready-to-claim, .badge.verified { background: #dff5ea; color: #11704a; }
