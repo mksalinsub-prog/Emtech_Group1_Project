@@ -1,7 +1,8 @@
 ﻿import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import StatusBadge from '../components/StatusBadge'
-import { residents } from '../data/mock'
+import { api } from '../api'
+import { residents as sampleResidents } from '../data/mock'
 
 const steps = ['Scan QR', 'Resident match', 'Request details', 'Review', 'Submitted']
 
@@ -12,17 +13,19 @@ export default function Scan() {
   const [error, setError] = useState('')
   const [scanning, setScanning] = useState(false)
 
-  function handleScan(e) {
+  async function handleScan(e) {
     e.preventDefault()
     setError('')
     setScanning(true)
-    // Simulated scan: the typed ID stands in for the QR payload (the QR holds only the resident ID).
-    setTimeout(() => {
-      const found = residents.find((r) => r.id.toLowerCase() === code.trim().toLowerCase())
+    // The typed ID stands in for the QR payload. The API looks the resident up in MongoDB.
+    try {
+      const found = await api(`/residents/${encodeURIComponent(code.trim())}`)
+      setMatch(found)
+    } catch {
+      setError('No resident matches this code. Check the ID or search by name.')
+    } finally {
       setScanning(false)
-      if (found) setMatch(found)
-      else setError('No resident matches this code. Check the ID or search by name.')
-    }, 800)
+    }
   }
 
   function reset() {
@@ -56,7 +59,7 @@ export default function Scan() {
             </form>
             <div className="chips">
               <span className="muted">Try:</span>
-              {residents.slice(0, 3).map((r) => (
+              {sampleResidents.slice(0, 3).map((r) => (
                 <button key={r.id} type="button" className="chip" onClick={() => setCode(r.id)}>{r.id}</button>
               ))}
             </div>
