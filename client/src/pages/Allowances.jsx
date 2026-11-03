@@ -1,35 +1,56 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import StatusBadge from '../components/StatusBadge'
-import { beneficiaries as seed, allowanceCategories } from '../data/assistance'
+import { api } from '../api'
+import { allowanceCategories } from '../data/assistance'
 
 const peso = (n) => `\u20B1${n.toLocaleString('en-PH')}`
-const prefix = { 'Senior Citizen': 'SC', PWD: 'PWD', 'Solo Parent': 'SP' }
-const amount = 1000
+const counted = ['Eligible', 'Paid']
 
 export default function Allowances() {
-  const [items, setItems] = useState(seed)
+  const [items, setItems] = useState(null)
+  const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ name: '', category: 'Senior Citizen' })
 
+  useEffect(() => {
+    api('/allowances').then(setItems).catch((err) => setError(err.message))
+  }, [])
+
+  async function setStatus(id, status) {
+    setError('')
+    try {
+      const updated = await api(`/allowances/${id}/status`, { method: 'PATCH', body: { status } })
+      setItems(items.map((b) => (b.id === id ? updated : b)))
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  async function add(e) {
+    e.preventDefault()
+    setError('')
+    try {
+      const created = await api('/allowances', { method: 'POST', body: form })
+      setItems([...items, created])
+      setForm({ name: '', category: 'Senior Citizen' })
+      setShowForm(false)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  if (!items && !error) return <p className="muted">Loading beneficiaries...</p>
+  if (!items) return <div className="error">{error}</div>
+
   const q = query.trim().toLowerCase()
   const shown = items.filter((b) => (category === 'all' || b.category === category) && (!q || [b.name, b.id].join(' ').toLowerCase().includes(q)))
   const count = (s) => items.filter((b) => b.status === s).length
-  const allocation = items.filter((b) => ['Eligible', 'Paid'].includes(b.status)).length * amount
+  const sum = (list) => list.reduce((total, b) => total + b.amount, 0)
+  const allocation = sum(items.filter((b) => counted.includes(b.status)))
+  const paid = sum(items.filter((b) => b.status === 'Paid'))
   const attention = items.filter((b) => ['For verification', 'On hold'].includes(b.status))
-
-  function setStatus(id, status) {
-    setItems(items.map((b) => (b.id === id ? { ...b, status } : b)))
-  }
-
-  function add(e) {
-    e.preventDefault()
-    const id = `${prefix[form.category]}-2026-${String(130 + items.length).padStart(4, '0')}`
-    setItems([...items, { id, name: form.name, category: form.category, status: 'For verification' }])
-    setForm({ name: '', category: 'Senior Citizen' })
-    setShowForm(false)
-  }
 
   return (
     <div>
@@ -40,6 +61,7 @@ export default function Allowances() {
         </div>
         <button className="btn" onClick={() => setShowForm(!showForm)}>{showForm ? 'Close form' : 'Add beneficiary'}</button>
       </div>
+      {error && <div className="error">{error}</div>}
 
       {showForm && (
         <form className="card" onSubmit={add} style={{ marginBottom: 16 }}>
@@ -59,8 +81,8 @@ export default function Allowances() {
       <div className="stat-grid">
         <div className="card stat"><div className="stat-value">{count('Eligible')}</div><div className="muted">Eligible beneficiaries</div></div>
         <div className="card stat"><div className="stat-value">{count('For verification')}</div><div className="muted">For verification</div></div>
-        <div className="card stat"><div className="stat-value">{peso(allocation)}</div><div className="muted">November allocation</div></div>
-        <div className="card stat"><div className="stat-value">{peso(count('Paid') * amount)}</div><div className="muted">Paid this month</div></div>
+        <div className="card stat"><div className="stat-value">{peso(allocation)}</div><div className="muted">Allocation</div></div>
+        <div className="card stat"><div className="stat-value">{peso(paid)}</div><div className="muted">Paid</div></div>
       </div>
 
       <div className="alert">PWD and medical records are sensitive personal information. Access is limited to authorized staff.</div>
@@ -77,7 +99,7 @@ export default function Allowances() {
       </div>
 
       <div className="toolbar">
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search beneficiary, allowance ID, or category..." />
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search beneficiary or allowance ID..." />
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="all">All categories</option>
           {allowanceCategories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -93,7 +115,7 @@ export default function Allowances() {
                 <strong>{b.name}</strong>
                 <div className="muted">{b.id} &middot; {b.category}</div>
               </div>
-              <span className="muted">{peso(amount)}</span>
+              <span className="muted">{peso(b.amount)}</span>
               <StatusBadge status={b.status} />
               <span>
                 {b.status === 'Eligible' && <button className="link-btn" onClick={() => setStatus(b.id, 'Paid')}>Mark paid</button>}
@@ -110,7 +132,7 @@ export default function Allowances() {
             {allowanceCategories.map((c) => (
               <div className="row" key={c.id}>
                 <span>{c.batch}<div className="muted">{c.name}</div></span>
-                <strong>{peso(items.filter((b) => b.category === c.id && ['Eligible', 'Paid'].includes(b.status)).length * c.amount)}</strong>
+                <strong>{peso(sum(items.filter((b) => b.category === c.id && counted.includes(b.status))))}</strong>
               </div>
             ))}
           </section>
