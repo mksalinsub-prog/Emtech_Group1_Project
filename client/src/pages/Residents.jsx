@@ -1,11 +1,20 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import StatusBadge from '../components/StatusBadge'
-import { residents } from '../data/mock'
+import { api } from '../api'
 
 export default function Residents() {
+  const [residents, setResidents] = useState(null)
+  const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [purok, setPurok] = useState('all')
+
+  useEffect(() => {
+    api('/residents').then(setResidents).catch((err) => setError(err.message))
+  }, [])
+
+  if (error) return <div className="error">{error}</div>
+  if (!residents) return <p className="muted">Loading residents...</p>
 
   const q = query.trim().toLowerCase()
   const shown = residents.filter((r) => {

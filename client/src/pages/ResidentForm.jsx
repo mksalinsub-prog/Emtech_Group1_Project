@@ -1,17 +1,18 @@
-﻿import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { residents } from '../data/mock'
+﻿import { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { api } from '../api'
 
 const empty = {
   firstName: '', middleName: '', lastName: '', birthDate: '', sex: '', civilStatus: '',
   citizenship: 'Filipino', address: '', purok: '', mobile: '', email: '', idType: '', idReference: '',
+  status: 'For verification',
 }
 
-export default function ResidentForm() {
-  const { id } = useParams()
-  const existing = residents.find((r) => r.id === id)
+function FormBody({ existing }) {
+  const navigate = useNavigate()
   const editing = Boolean(existing)
-
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
   const [form, setForm] = useState(() => {
     if (!existing) return empty
     const parts = existing.name.split(' ')
@@ -25,19 +26,45 @@ export default function ResidentForm() {
       citizenship: existing.citizenship,
       address: existing.address,
       purok: String(existing.purok),
+      mobile: existing.mobile || '',
+      email: existing.email || '',
+      idType: existing.idType || '',
+      idReference: existing.idReference || '',
+      status: existing.status,
     }
   })
-  const [saved, setSaved] = useState(false)
 
   function update(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
-    setSaved(false)
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    // Demo only: records are not stored until the backend is connected.
-    setSaved(true)
+    setError('')
+    setBusy(true)
+    const body = {
+      name: [form.firstName, form.middleName, form.lastName].filter(Boolean).join(' '),
+      address: form.address,
+      purok: Number(form.purok),
+      birthDate: form.birthDate,
+      sex: form.sex,
+      civilStatus: form.civilStatus,
+      citizenship: form.citizenship,
+      mobile: form.mobile,
+      email: form.email,
+      idType: form.idType,
+      idReference: form.idReference,
+    }
+    if (editing) body.status = form.status
+    try {
+      const saved = editing
+        ? await api(`/residents/${existing.id}`, { method: 'PUT', body })
+        : await api('/residents', { method: 'POST', body })
+      navigate(`/residents/${saved.id}`)
+    } catch (err) {
+      setError(err.message)
+      setBusy(false)
+    }
   }
 
   return (
@@ -45,7 +72,7 @@ export default function ResidentForm() {
       <div className="page-head">
         <div>
           <h1>{editing ? 'Edit resident' : 'Add new resident'}</h1>
-          <p className="muted">{editing ? `Update ${existing.name}'s verified profile.` : 'Create a verified resident profile and household link.'}</p>
+          <p className="muted">{editing ? `Update ${existing.name}'s verified profile.` : 'Create a resident profile. New residents start as "For verification".'}</p>
         </div>
         {editing && <span className="badge">{existing.id}</span>}
       </div>
@@ -91,15 +118,45 @@ export default function ResidentForm() {
             </select>
           </label>
           <label>ID reference<input name="idReference" value={form.idReference} onChange={update} /></label>
+          {editing && (
+            <label>Status
+              <select name="status" value={form.status} onChange={update}>
+                <option>Active</option><option>For verification</option><option>Inactive</option>
+              </select>
+            </label>
+          )}
         </div>
         <div className="alert">Identity verification required: confirm a valid government ID and resident consent before saving.</div>
 
-        {saved && <div className="success">Saved (demo). Records are not stored until the backend is connected.</div>}
+        {error && <div className="error">{error}</div>}
         <div className="btn-row">
           <Link className="btn ghost" to="/residents">Back to residents</Link>
-          <button className="btn" type="submit">{editing ? 'Save changes' : 'Save resident'}</button>
+          <button className="btn" type="submit" disabled={busy}>{busy ? 'Saving...' : editing ? 'Save changes' : 'Save resident'}</button>
         </div>
       </section>
     </form>
   )
+}
+
+export default function ResidentForm() {
+  const { id } = useParams()
+  const [existing, setExisting] = useState(null)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!id) return
+    api(`/residents/${id}`).then(setExisting).catch((err) => setError(err.message))
+  }, [id])
+
+  if (error) {
+    return (
+      <div>
+        <h1>Resident not found</h1>
+        <p className="muted">{error}</p>
+        <Link className="btn" to="/residents">Back to residents</Link>
+      </div>
+    )
+  }
+  if (id && !existing) return <p className="muted">Loading...</p>
+  return <FormBody existing={existing} />
 }

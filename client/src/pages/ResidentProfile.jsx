@@ -1,22 +1,31 @@
-﻿import { Link, useParams } from 'react-router-dom'
+﻿import { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import StatusBadge from '../components/StatusBadge'
-import { residents, myRequests, resident as portalResident } from '../data/mock'
+import { api } from '../api'
+import { myRequests, resident as portalResident } from '../data/mock'
 
 export default function ResidentProfile() {
   const { id } = useParams()
-  const person = residents.find((r) => r.id === id)
+  const [person, setPerson] = useState(null)
+  const [error, setError] = useState('')
 
-  if (!person) {
+  useEffect(() => {
+    api(`/residents/${id}`).then(setPerson).catch((err) => setError(err.message))
+  }, [id])
+
+  if (error) {
     return (
       <div>
         <h1>Resident not found</h1>
-        <p className="muted">No resident matches this ID.</p>
+        <p className="muted">{error}</p>
         <Link className="btn" to="/residents">Back to residents</Link>
       </div>
     )
   }
+  if (!person) return <p className="muted">Loading profile...</p>
 
+  // Transactions still come from mock data until the certificates API is connected.
   const history = person.id === portalResident.id ? myRequests : []
 
   return (
@@ -45,6 +54,8 @@ export default function ResidentProfile() {
             </div>
             <div className="muted">Address</div>
             <strong>{person.address}, Barangay 607 Zone 61</strong>
+            <div className="muted" style={{ marginTop: 10 }}>Mobile</div>
+            <strong>{person.mobile || '-'}</strong>
           </section>
           <section className="card">
             <h3>Recent transactions</h3>
