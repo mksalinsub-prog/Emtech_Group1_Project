@@ -1,16 +1,53 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import StatusBadge from '../components/StatusBadge'
-import { incidents as seed } from '../data/cases'
+import { api } from '../api'
 
+const statuses = ['Open', 'Under review', 'Referred', 'Resolved']
 const blank = { category: 'Road incident', priority: 'Normal', title: '', location: '', narrative: '', reporter: '', assignedTo: 'Peace and Order Committee' }
+const fmt = (iso) => new Date(iso).toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 
 export default function Incidents() {
-  const [items, setItems] = useState(seed)
+  const [items, setItems] = useState(null)
+  const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState('all')
   const [showForm, setShowForm] = useState(false)
   const [savedId, setSavedId] = useState('')
   const [form, setForm] = useState(blank)
+
+  useEffect(() => {
+    api('/incidents').then(setItems).catch((err) => setError(err.message))
+  }, [])
+
+  async function changeStatus(id, next) {
+    try {
+      const updated = await api(`/incidents/${id}/status`, { method: 'PATCH', body: { status: next } })
+      setItems(items.map((i) => (i.id === id ? updated : i)))
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  async function submit(e) {
+    e.preventDefault()
+    setError('')
+    try {
+      const created = await api('/incidents', { method: 'POST', body: form })
+      setItems([created, ...items])
+      setSavedId(created.id)
+      setShowForm(false)
+      setForm(blank)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  function update(e) {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  if (!items && !error) return <p className="muted">Loading incidents...</p>
+  if (!items) return <div className="error">{error}</div>
 
   const q = query.trim().toLowerCase()
   const shown = items.filter((i) => {
@@ -18,20 +55,6 @@ export default function Incidents() {
     return (status === 'all' || i.status === status) && (!q || text.includes(q))
   })
   const count = (s) => items.filter((i) => i.status === s).length
-
-  function update(e) {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
-
-  function submit(e) {
-    e.preventDefault()
-    const id = `INC-2026-${String(82 + items.length - seed.length).padStart(4, '0')}`
-    const date = new Date().toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
-    setItems([{ id, title: form.title, location: form.location, date, status: 'Open', category: form.category }, ...items])
-    setSavedId(id)
-    setShowForm(false)
-    setForm(blank)
-  }
 
   if (showForm) {
     return (
@@ -65,6 +88,7 @@ export default function Incidents() {
             <label style={{ gridColumn: '1 / -1' }}>Incident narrative<textarea name="narrative" value={form.narrative} onChange={update} required /></label>
             <label>Reporting person<input name="reporter" value={form.reporter} onChange={update} required /></label>
           </div>
+          {error && <div className="error">{error}</div>}
           <div className="btn-row">
             <button type="button" className="btn ghost" onClick={() => setShowForm(false)}>Cancel</button>
             <button className="btn" type="submit">Submit incident report</button>
@@ -83,10 +107,11 @@ export default function Incidents() {
         </div>
         <button className="btn" onClick={() => setShowForm(true)}>Log new incident</button>
       </div>
-      {savedId && <div className="success">Incident {savedId} logged (demo). It resets on refresh until the backend is connected.</div>}
+      {savedId && <div className="success">Incident {savedId} saved to the database.</div>}
+      {error && <div className="error">{error}</div>}
 
       <div className="stat-grid">
-        {['Open', 'Under review', 'Referred', 'Resolved'].map((s) => (
+        {statuses.map((s) => (
           <div className="card stat" key={s}><div className="stat-value">{count(s)}</div><div className="muted">{s}</div></div>
         ))}
       </div>
@@ -95,7 +120,7 @@ export default function Incidents() {
         <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search incident ID, location, or keyword..." />
         <select value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="all">All statuses</option>
-          {['Open', 'Under review', 'Referred', 'Resolved'].map((s) => <option key={s}>{s}</option>)}
+          {statuses.map((s) => <option key={s}>{s}</option>)}
         </select>
       </div>
 
@@ -107,8 +132,11 @@ export default function Incidents() {
               <strong>{i.title}</strong>
               <div className="muted">{i.location}</div>
             </div>
-            <span className="muted">{i.id} &middot; {i.date}</span>
+            <span className="muted">{i.id} &middot; {fmt(i.occurredAt)}</span>
             <StatusBadge status={i.status} />
+            <select value={i.status} onChange={(e) => changeStatus(i.id, e.target.value)}>
+              {statuses.map((s) => <option key={s}>{s}</option>)}
+            </select>
           </div>
         ))}
         {shown.length === 0 && <p className="muted">No incidents match your search.</p>}
