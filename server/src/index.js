@@ -7,6 +7,8 @@ import residentRoutes from './routes/residents.js'
 import certificateRoutes from './routes/certificates.js'
 import incidentRoutes from './routes/incidents.js'
 import complaintRoutes from './routes/complaints.js'
+import inquiryRoutes from './routes/inquiries.js'
+import allowanceRoutes from './routes/allowances.js'
 
 const app = express()
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }))
@@ -18,6 +20,8 @@ app.use('/api/residents', residentRoutes)
 app.use('/api/certificates', certificateRoutes)
 app.use('/api/incidents', incidentRoutes)
 app.use('/api/complaints', complaintRoutes)
+app.use('/api/inquiries', inquiryRoutes)
+app.use('/api/allowances', allowanceRoutes)
 
 app.use((req, res) => res.status(404).json({ message: 'Not found' }))
 app.use((err, req, res, next) => {
