@@ -3,15 +3,18 @@ import { Link, useParams } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import StatusBadge from '../components/StatusBadge'
 import { api } from '../api'
-import { myRequests, resident as portalResident } from '../data/mock'
 
 export default function ResidentProfile() {
   const { id } = useParams()
   const [person, setPerson] = useState(null)
+  const [history, setHistory] = useState([])
   const [error, setError] = useState('')
 
   useEffect(() => {
     api(`/residents/${id}`).then(setPerson).catch((err) => setError(err.message))
+    api('/certificates')
+      .then((all) => setHistory(all.filter((r) => r.residentId === id)))
+      .catch(() => setHistory([]))
   }, [id])
 
   if (error) {
@@ -25,15 +28,12 @@ export default function ResidentProfile() {
   }
   if (!person) return <p className="muted">Loading profile...</p>
 
-  // Transactions still come from mock data until the certificates API is connected.
-  const history = person.id === portalResident.id ? myRequests : []
-
   return (
     <div>
       <div className="page-head">
         <div>
           <h1>Resident profile</h1>
-          <p className="muted">Verified resident record and transaction history.</p>
+          <p className="muted">Resident record and transaction history.</p>
         </div>
         <div className="btn-row">
           <Link className="btn ghost" to={`/residents/${person.id}/edit`}>Edit profile</Link>
@@ -63,7 +63,7 @@ export default function ResidentProfile() {
             {history.map((r) => (
               <div className="row" key={r.id}>
                 <div>
-                  <strong>{r.title}</strong>
+                  <strong>{r.type}</strong>
                   <div className="muted">{r.id} &middot; {r.purpose}</div>
                 </div>
                 <StatusBadge status={r.status} />
