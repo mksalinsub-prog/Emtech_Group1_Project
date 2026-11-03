@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ['admin', 'staff', 'resident'], default: 'resident' },
     residentId: { type: String, default: null },
+    resetTokenHash: { type: String, default: null },
+    resetExpires: { type: Date, default: null },
   },
   { timestamps: true }
 )
