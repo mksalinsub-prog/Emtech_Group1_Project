@@ -1,13 +1,16 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import StatusBadge from '../components/StatusBadge'
-import { residents } from '../data/mock'
-import { inquiries as seed, inquiryTypes } from '../data/assistance'
+import { api } from '../api'
+import { inquiryTypes } from '../data/assistance'
 
 const statuses = ['Documents needed', 'For assessment', 'Referred', 'Resolved']
-const blank = { resident: '', type: 'Medical', need: '', urgency: 'Within 7 days' }
+const blank = { residentId: '', type: 'Medical', need: '', urgency: 'Within 7 days' }
+const fmt = (iso) => new Date(iso).toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 
 export default function Inquiries() {
-  const [items, setItems] = useState(seed)
+  const [items, setItems] = useState(null)
+  const [residents, setResidents] = useState([])
+  const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [showForm, setShowForm] = useState(false)
@@ -15,36 +18,61 @@ export default function Inquiries() {
   const [selectedId, setSelectedId] = useState(null)
   const [note, setNote] = useState('')
 
-  const selected = items.find((i) => i.id === selectedId)
-  const q = query.trim().toLowerCase()
-  const shown = items.filter((i) => {
-    const text = [i.resident, i.id, i.need].join(' ').toLowerCase()
-    return (typeFilter === 'all' || i.type === typeFilter) && (!q || text.includes(q))
-  })
+  useEffect(() => {
+    api('/inquiries').then(setItems).catch((err) => setError(err.message))
+  }, [])
 
-  function patch(id, changes) {
-    setItems(items.map((i) => (i.id === id ? { ...i, ...changes } : i)))
+  useEffect(() => {
+    if (showForm) api('/residents').then(setResidents).catch((err) => setError(err.message))
+  }, [showForm])
+
+  function replace(doc) {
+    setItems(items.map((i) => (i.id === doc.id ? doc : i)))
+  }
+
+  async function act(request) {
+    setError('')
+    try {
+      replace(await request())
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   function update(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
-    const id = `INQ-2026-${String(329 + items.length - seed.length).padStart(4, '0')}`
-    setItems([{ id, ...form, status: 'Documents needed', received: [], updates: [] }, ...items])
-    setShowForm(false)
-    setForm(blank)
-    setSelectedId(id)
+    setError('')
+    try {
+      const created = await api('/inquiries', { method: 'POST', body: form })
+      setItems([created, ...items])
+      setShowForm(false)
+      setForm(blank)
+      setSelectedId(created.id)
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
-  function addNote(e) {
+  async function addNote(e) {
     e.preventDefault()
     if (!note.trim()) return
-    patch(selected.id, { updates: [...selected.updates, note.trim()] })
+    await act(() => api(`/inquiries/${selectedId}/notes`, { method: 'POST', body: { text: note } }))
     setNote('')
   }
+
+  if (!items && !error) return <p className="muted">Loading inquiries...</p>
+  if (!items) return <div className="error">{error}</div>
+
+  const selected = items.find((i) => i.id === selectedId)
+  const q = query.trim().toLowerCase()
+  const shown = items.filter((i) => {
+    const text = [i.resident, i.id, i.need].join(' ').toLowerCase()
+    return (typeFilter === 'all' || i.type === typeFilter) && (!q || text.includes(q))
+  })
 
   if (showForm) {
     return (
@@ -54,9 +82,9 @@ export default function Inquiries() {
         <section className="card" style={{ marginTop: 16 }}>
           <div className="form-grid">
             <label>Resident
-              <select name="resident" value={form.resident} onChange={update} required>
+              <select name="residentId" value={form.residentId} onChange={update} required>
                 <option value="">Select resident</option>
-                {residents.map((r) => <option key={r.id} value={r.name}>{r.name}</option>)}
+                {residents.map((r) => <option key={r.id} value={r.id}>{r.name} ({r.id})</option>)}
               </select>
             </label>
             <label>Assistance type
@@ -71,6 +99,7 @@ export default function Inquiries() {
             </label>
             <label style={{ gridColumn: '1 / -1' }}>Need<input name="need" value={form.need} onChange={update} required /></label>
           </div>
+          {error && <div className="error">{error}</div>}
           <div className="btn-row">
             <button type="button" className="btn ghost" onClick={() => setShowForm(false)}>Cancel</button>
             <button className="btn" type="submit">Save inquiry</button>
@@ -92,6 +121,7 @@ export default function Inquiries() {
           </div>
           <StatusBadge status={selected.status} />
         </div>
+        {error && <div className="error">{error}</div>}
         <div className="scan-grid">
           <div className="stack">
             <section className="card">
@@ -110,7 +140,7 @@ export default function Inquiries() {
                     ) : (
                       <span>
                         <StatusBadge status="Missing" />{' '}
-                        <button className="link-btn" onClick={() => patch(selected.id, { received: [...selected.received, d] })}>Mark received</button>
+                        <button className="link-btn" onClick={() => act(() => api(`/inquiries/${selected.id}/received`, { method: 'POST', body: { document: d } }))}>Mark received</button>
                       </span>
                     )}
                   </div>
@@ -120,7 +150,12 @@ export default function Inquiries() {
             <section className="card">
               <h3>Staff notes</h3>
               {selected.updates.length === 0 && <p className="muted">No notes yet.</p>}
-              {selected.updates.map((u) => <div className="timeline-item" key={u}>{u}</div>)}
+              {selected.updates.map((u) => (
+                <div className="timeline-item" key={u.at + u.text}>
+                  <strong>{u.text}</strong>
+                  <div className="muted">{fmt(u.at)}</div>
+                </div>
+              ))}
               <form className="add-update" onSubmit={addNote}>
                 <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Add a note..." />
                 <button className="btn" type="submit">Post update</button>
@@ -130,7 +165,7 @@ export default function Inquiries() {
           <section className="card">
             <h3>Status</h3>
             <div className="toolbar">
-              <select value={selected.status} onChange={(e) => patch(selected.id, { status: e.target.value })}>
+              <select value={selected.status} onChange={(e) => act(() => api(`/inquiries/${selected.id}/status`, { method: 'PATCH', body: { status: e.target.value } }))}>
                 {statuses.map((s) => <option key={s}>{s}</option>)}
               </select>
             </div>
@@ -150,6 +185,7 @@ export default function Inquiries() {
         </div>
         <button className="btn" onClick={() => setShowForm(true)}>New inquiry</button>
       </div>
+      {error && <div className="error">{error}</div>}
       <div className="three-col">
         {inquiryTypes.map((t) => (
           <button key={t.id} className="case-card" onClick={() => setTypeFilter(t.id)}>
@@ -159,7 +195,7 @@ export default function Inquiries() {
         ))}
       </div>
       <div className="toolbar">
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search inquiry, resident, or category..." />
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search inquiry, resident, or need..." />
         <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
           <option value="all">All assistance types</option>
           {inquiryTypes.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
