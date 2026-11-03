@@ -1,8 +1,8 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import StatusBadge from '../components/StatusBadge'
-import { residents } from '../data/mock'
+import { api } from '../api'
 import { certificateTypes, feeLabel } from '../data/certificates'
 
 // Mock name for the demo. Replace it with the real Punong Barangay.
@@ -41,6 +41,7 @@ function Paper({ person, type, purpose, date }) {
 export default function NewCertificate() {
   const location = useLocation()
   const [params] = useSearchParams()
+  const [residents, setResidents] = useState([])
   const [person, setPerson] = useState(location.state?.resident ?? null)
   const [typeId, setTypeId] = useState(params.get('type') ?? 'clearance')
   const [form, setForm] = useState({ category: 'Legal', purpose: '', copies: 1, notes: '' })
@@ -48,6 +49,13 @@ export default function NewCertificate() {
   const [receipt, setReceipt] = useState('')
   const [release, setRelease] = useState('Claim at barangay office')
   const [issued, setIssued] = useState(null)
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    if (person) return
+    api('/residents').then(setResidents).catch((err) => setError(err.message))
+  }, [person])
 
   const type = certificateTypes.find((t) => t.id === typeId) ?? certificateTypes[0]
   const date = new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -63,11 +71,32 @@ export default function NewCertificate() {
     setStep(3)
   }
 
-  function issue(e) {
+  async function issue(e) {
     e.preventDefault()
-    // Demo only: requests are not stored until the backend is connected.
-    setIssued({ id: `REQ-2026-${1049 + Math.floor(Math.random() * 50)}`, receipt: receipt || 'No fee' })
-    setStep(4)
+    setError('')
+    setBusy(true)
+    try {
+      const created = await api('/certificates', {
+        method: 'POST',
+        body: {
+          residentId: person.id,
+          typeId: type.id,
+          type: type.name,
+          purpose,
+          copies: Number(form.copies) || 1,
+          notes: form.notes,
+          fee: type.fee,
+          receipt,
+          release,
+        },
+      })
+      setIssued(created)
+      setStep(4)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -84,6 +113,7 @@ export default function NewCertificate() {
         <section className="card">
           <h3>Choose a resident</h3>
           <p className="muted">Scan the resident's QR code, or pick a resident from the list.</p>
+          {error && <div className="error">{error}</div>}
           <div className="toolbar">
             <select defaultValue="" onChange={(e) => setPerson(residents.find((r) => r.id === e.target.value) ?? null)}>
               <option value="">Select resident</option>
@@ -167,9 +197,10 @@ export default function NewCertificate() {
                 </label>
                 <label>Signatory<input value={punongBarangay} disabled /></label>
               </div>
+              {error && <div className="error">{error}</div>}
               <div className="btn-row">
                 <button type="button" className="btn ghost" onClick={() => setStep(2)}>Back to edit</button>
-                <button className="btn" type="submit">Submit and issue</button>
+                <button className="btn" type="submit" disabled={busy}>{busy ? 'Saving...' : 'Submit and issue'}</button>
               </div>
             </section>
           </div>
@@ -179,12 +210,12 @@ export default function NewCertificate() {
       {person && step === 4 && issued && (
         <div>
           <section className="card no-print">
-            <h3>Certificate submitted successfully</h3>
-            <p className="muted">{type.name} for {person.name} is ready for printing and release.</p>
+            <h3>Certificate saved successfully</h3>
+            <p className="muted">{issued.type} for {issued.residentName} is saved and ready for printing and release.</p>
             <div className="match-info">
               <div><div className="muted">Request</div><strong>{issued.id}</strong></div>
-              <div><div className="muted">Receipt</div><strong>{issued.receipt}</strong></div>
-              <div><div className="muted">Status</div><StatusBadge status="Ready to release" /></div>
+              <div><div className="muted">Receipt</div><strong>{issued.receipt || 'No fee'}</strong></div>
+              <div><div className="muted">Status</div><StatusBadge status={issued.status} /></div>
             </div>
             <div className="btn-row">
               <button className="btn" onClick={() => window.print()}>Print certificate</button>

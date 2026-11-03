@@ -1,57 +1,76 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import StatusBadge from '../components/StatusBadge'
-import { residents } from '../data/mock'
-import { complaints as seed } from '../data/cases'
+import { api } from '../api'
 
 const columns = ['Pending', 'In progress', 'Resolved']
 const blank = { residentId: '', category: 'Public works / drainage', committee: 'Public Works & Sanitation', subject: '', description: '' }
-const now = () => new Date().toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+const fmt = (iso) => new Date(iso).toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 
 export default function Complaints() {
-  const [items, setItems] = useState(seed)
+  const [items, setItems] = useState(null)
+  const [residents, setResidents] = useState([])
+  const [error, setError] = useState('')
   const [selectedId, setSelectedId] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(blank)
   const [note, setNote] = useState('')
 
-  const selected = items.find((c) => c.id === selectedId)
-  const count = (s) => items.filter((c) => c.status === s).length
+  useEffect(() => {
+    api('/complaints').then(setItems).catch((err) => setError(err.message))
+  }, [])
 
-  function patch(id, changes) {
-    setItems(items.map((c) => (c.id === id ? { ...c, ...changes } : c)))
+  useEffect(() => {
+    if (showForm) api('/residents').then(setResidents).catch((err) => setError(err.message))
+  }, [showForm])
+
+  function replace(doc) {
+    setItems(items.map((c) => (c.id === doc.id ? doc : c)))
   }
 
   function update(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
-    const person = residents.find((r) => r.id === form.residentId)
-    const id = `CMP-2026-${String(228 + items.length - seed.length).padStart(4, '0')}`
-    setItems([{
-      id, subject: form.subject, resident: person.name, purok: person.purok, category: form.category,
-      committee: form.committee, status: 'Pending', description: form.description,
-      updates: [{ text: 'Complaint received', time: now() }],
-    }, ...items])
-    setShowForm(false)
-    setForm(blank)
-    setSelectedId(id)
+    setError('')
+    try {
+      const created = await api('/complaints', { method: 'POST', body: form })
+      setItems([created, ...items])
+      setShowForm(false)
+      setForm(blank)
+      setSelectedId(created.id)
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
-  function addUpdate(e) {
+  async function addUpdate(e) {
     e.preventDefault()
     if (!note.trim()) return
-    patch(selected.id, {
-      status: selected.status === 'Pending' ? 'In progress' : selected.status,
-      updates: [...selected.updates, { text: note.trim(), time: now() }],
-    })
-    setNote('')
+    setError('')
+    try {
+      replace(await api(`/complaints/${selectedId}/updates`, { method: 'POST', body: { text: note } }))
+      setNote('')
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
-  function resolve() {
-    patch(selected.id, { status: 'Resolved', updates: [...selected.updates, { text: 'Marked as resolved', time: now() }] })
+  async function resolve() {
+    setError('')
+    try {
+      replace(await api(`/complaints/${selectedId}/resolve`, { method: 'POST' }))
+    } catch (err) {
+      setError(err.message)
+    }
   }
+
+  if (!items && !error) return <p className="muted">Loading complaints...</p>
+  if (!items) return <div className="error">{error}</div>
+
+  const selected = items.find((c) => c.id === selectedId)
+  const count = (s) => items.filter((c) => c.status === s).length
 
   if (showForm) {
     return (
@@ -84,6 +103,7 @@ export default function Complaints() {
             <label style={{ gridColumn: '1 / -1' }}>Description<textarea name="description" value={form.description} onChange={update} required /></label>
           </div>
           <div className="notice">Privacy reminder: include only information needed to resolve the complaint.</div>
+          {error && <div className="error">{error}</div>}
           <div className="btn-row">
             <button type="button" className="btn ghost" onClick={() => setShowForm(false)}>Cancel</button>
             <button className="btn" type="submit">Submit complaint</button>
@@ -104,6 +124,7 @@ export default function Complaints() {
           </div>
           <StatusBadge status={selected.status} />
         </div>
+        {error && <div className="error">{error}</div>}
         <div className="scan-grid">
           <div className="stack">
             <section className="card">
@@ -114,9 +135,9 @@ export default function Complaints() {
             <section className="card">
               <h3>Tracking updates</h3>
               {selected.updates.map((u) => (
-                <div className="timeline-item" key={u.time + u.text}>
+                <div className="timeline-item" key={u.at + u.text}>
                   <strong>{u.text}</strong>
-                  <div className="muted">{u.time}</div>
+                  <div className="muted">{fmt(u.at)}</div>
                 </div>
               ))}
               {selected.status !== 'Resolved' && (
@@ -150,6 +171,7 @@ export default function Complaints() {
         </div>
         <button className="btn" onClick={() => setShowForm(true)}>Submit complaint</button>
       </div>
+      {error && <div className="error">{error}</div>}
       <div className="stat-grid">
         {columns.map((c) => (
           <div className="card stat" key={c}><div className="stat-value">{count(c)}</div><div className="muted">{c}</div></div>
