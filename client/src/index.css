@@ -114,3 +114,7 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #f1f4f9; color
 .badge.eligible, .badge.paid, .badge.received { background: #dff5ea; color: #11704a; }
 .badge.on-hold, .badge.missing { background: #fde2e2; color: #a12626; }
 .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+.login-card.wide { max-width: 640px; }
+.login-card .form-grid { grid-template-columns: repeat(2, 1fr); }
+.login-card .form-grid label { margin: 0; }
+.login-card .success { margin-top: 12px; }
